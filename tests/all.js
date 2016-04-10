@@ -1,6 +1,5 @@
 /*globals newDefine:false, newLoader:false, newRequire:false*/
-/*globals define:true, loader:true, require:true*/
-
+/*globals define:true, loader:true, require:true, defineModule:true*/
 'use strict';
 
 var keys;
@@ -672,4 +671,17 @@ test('wrapModules is called when present', function() {
   equal(annotatorCalled, 0);
   require('foo');
   equal(annotatorCalled, 1);
+});
+
+test('defineModule with no exports', function() {
+  defineModule('foo','{"deps": [], "body": "return 1 + 1" }');
+  var result =  require('foo');
+  equal(result, 2);
+});
+
+test('defineModule with deps and exports', function() {
+  defineModule('bar','{"deps": ["exports"], "body": "exports[\\"default\\"] = 1 + 1;" }');
+  defineModule('foo','{"deps": ["exports", "bar"], "body": "exports[\\"default\\"] = bar[\\"default\\"] + 1;" }');
+  var result =  require('foo')['default'];
+  equal(result, 3);
 });
